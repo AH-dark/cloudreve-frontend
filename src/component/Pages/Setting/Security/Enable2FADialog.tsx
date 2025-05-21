@@ -56,6 +56,14 @@ const Enable2FADialog = ({
   const [code, setCode] = useState("");
   const [secret, setSecret] = useState("");
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasted = e.clipboardData.getData('text').trim();
+    if (/^\d{6}$/.test(pasted)) {
+      setCode(pasted);
+      e.preventDefault();
+    }
+  }
+
   useEffect(() => {
     if (open) {
       setLoading(true);
@@ -154,11 +162,16 @@ const Enable2FADialog = ({
                       </Typography>
                       <FormControl variant="standard" margin="normal" required>
                         <MuiOtpInputStyled
-                          TextFieldsProps={{ disabled: loading }}
+                          TextFieldsProps={(index: number) => ({
+                            disabled: loading,
+                            autoComplete: index === 0 ? 'one-time-code' : undefined,
+                            onPaste: index === 0 ? handlePaste : undefined,
+                          })}
                           autoFocus
                           length={6}
                           value={code}
                           onChange={setCode}
+                          inputMode="numeric"
                         />
                       </FormControl>
                     </Box>
